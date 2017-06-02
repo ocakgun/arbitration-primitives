@@ -1,7 +1,5 @@
 \documentclass[conference]{IEEEtran}
 \usepackage[pdftex]{graphicx}
-\graphicspath{{../pdf/}{../jpeg/}}
-\DeclareGraphicsExtensions{.pdf,.jpeg,.png}
 \usepackage{url}
 
 % correct bad hyphenation here
@@ -28,15 +26,60 @@ signals, and efficient handling of correlated sensor events.
 
 \section{Introduction}
 
-TODO
+Multiple timing and voltage domains\\
+Clocked vs async\\
+Analog vs digital\\
+A2A component\\
+Formal methods\\
+EDA support\\
 
+\subsection{STG specification language}
+
+Brief description\\
+
+Input/internal/output convention\\
+
+Signal transition loop\\
+
+Handshake\\
+
+Dummy\\
 
 \section{Synchronisation primitives}
 
 In this section we cover \emph{synchronisation primitives} that are used to
 isolate asynchronous control logic from potentially hazardous environment.
 
-\subsection{WAIT and WAIT0}
+\subsection{\textsf{WAIT} and \textsf{WAIT0}}
+
+The \textsf{WAIT} element, shown in Fig.~\ref{fig:wait}(left), synchronises the
+asynchronous handshake \textsf{ctrl/san}\footnote{The name \textsf{san} stands
+for `sanitised', emphasising the role of the element: the output \textsf{san}
+is a sanitised version of the `dirty' input \textsf{sig}.} with the
+non-persistent input~\textsf{sig}. As one can see from the STG specification,
+the input \textsf{sig} is unconstrained and is allowed to switch between~0 and~1
+values (signal transitions \textsf{sig+} and \textsf{sig-}) with no respect to
+the output handshake.
+When~\textsf{ctrl=1} the element waits for~\textsf{sig} to become high via the
+read arc connecting the place \textsf{sig1} and the dummy event~\textsf{e}. As
+soon as~\textsf{e} fires, the output~\textsf{san=1} is produced and is
+persistently held until the element is explicitly reset by releasing the
+control input (event~\textsf{ctrl-}).
+
+The non-persistent behaviour and associated metastability is fully contained
+within the element, guaranteeing a clean speed-independent asynchronous output.
+
+The implementation is based on the \emph{mutual-exclusion (ME)
+element}~\cite{2008_kinniment_synchronisation}, which is well-known and studied
+by the asynchronous circuit design community.
+
+This is a fundamental synchronisation primitive which is used when
+implementing other, more sophisticated components presented in this paper.
+The symmetric version of the element that waits for the input to become low is
+called \textsf{WAIT0}; its top-level block diagram, STG specification and
+implementation are shown in Fig.~\ref{fig:wait}(right).
+
+See [16] for implementation details.
 
 \subsection{RWAIT and RWAIT0}
 
@@ -44,24 +87,24 @@ isolate asynchronous control logic from potentially hazardous environment.
 
 \subsection{WAIT2}
 
-% \begin{figure*}[ht!]
-% \begin{center}
-%     \includegraphics[width=0.96\linewidth]{FIG/screen.png}
-%     \vspace{-3.5mm}
-%     \caption{From formal specification to hardware synthesis and
-%     simulation of a simple 3-instruction processing core. A screenshot of \textsc{Workcraft}.}
-%     \label{fig:screenshot}
-% \end{center}
-% \vspace{-7.5mm}
-% \end{figure*}
 
 \section{Decision-making primitives}
+
+\begin{figure}
+\begin{center}
+    \includegraphics[scale=0.23]{fig/WAIT.pdf}
+    \caption{\textsf{WAIT} and \textsf{WAIT0}: block diagram,
+    specification and implementation.}
+    \label{fig:wait}
+\end{center}
+\end{figure}
 
 This section presents a family of \emph{decision-making} components that perform
 non-trivial event arbitration and coordination tasks and rely on the previously
 introduced synchronisation primitives.
 
 \subsection{WAITX}
+\subsection{WAITX2}
 \subsection{SAMPLE}
 \subsection{OM}
 
@@ -79,6 +122,7 @@ introduced synchronisation primitives.
 
 \section*{Acknowledgements}
 
+\bibliographystyle{unsrt}
 \bibliography{publications}
 
 \end{document}
