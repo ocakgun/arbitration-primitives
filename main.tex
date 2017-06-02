@@ -1,0 +1,84 @@
+\documentclass[conference]{IEEEtran}
+\usepackage[pdftex]{graphicx}
+\graphicspath{{../pdf/}{../jpeg/}}
+\DeclareGraphicsExtensions{.pdf,.jpeg,.png}
+\usepackage{url}
+
+% correct bad hyphenation here
+\hyphenation{op-tical net-works semi-conduc-tor}
+
+\begin{document}
+\title{Asynchronous Arbitration Primitives\\for New Generation of Circuits and Systems}
+
+\author{\IEEEauthorblockN{Andrey Mokhov\IEEEauthorrefmark{1}, Victor Khomenko, Danil Sokolov, Alex Yakovlev}
+\IEEEauthorblockA{Newcastle University, Newcastle upon Tyne, United Kingdom}
+\IEEEauthorblockA{\IEEEauthorrefmark{1}\emph{Corresponding author:} \url{andrey.mokhov@ncl.ac.uk}}}
+
+\maketitle
+
+\begin{abstract}
+This paper presents an overview of a family of asynchronous arbitration
+primitives designed to increase the resilience and efficiency of
+the new generation of circuits and systems. We cover primitives for
+interfacing analog and digital worlds, sampling of non-persistent
+signals, and efficient handling of correlated sensor events.
+\end{abstract}
+
+% no keywords
+
+\section{Introduction}
+
+TODO
+
+
+\section{Synchronisation primitives}
+
+In this section we cover \emph{synchronisation primitives} that are used to
+isolate asynchronous control logic from potentially hazardous environment.
+
+\subsection{WAIT and WAIT0}
+
+\subsection{RWAIT and RWAIT0}
+
+\subsection{WAIT01 and WAIT10}
+
+\subsection{WAIT2}
+
+% \begin{figure*}[ht!]
+% \begin{center}
+%     \includegraphics[width=0.96\linewidth]{FIG/screen.png}
+%     \vspace{-3.5mm}
+%     \caption{From formal specification to hardware synthesis and
+%     simulation of a simple 3-instruction processing core. A screenshot of \textsc{Workcraft}.}
+%     \label{fig:screenshot}
+% \end{center}
+% \vspace{-7.5mm}
+% \end{figure*}
+
+\section{Decision-making primitives}
+
+This section presents a family of \emph{decision-making} components that perform
+non-trivial event arbitration and coordination tasks and rely on the previously
+introduced synchronisation primitives.
+
+\subsection{WAITX}
+\subsection{SAMPLE}
+\subsection{OM}
+
+% \begin{figure}[h!]
+% \begin{center}
+%   \includegraphics[width=0.84\linewidth]{FIG/ope-chip.pdf}
+%   \vspace{-3mm}
+%   \caption{Resiliency of asynchronous control under unstable voltage.}
+%   \label{fig:voltage-resiliency}
+% \end{center}
+% \vspace{-7mm}
+% \end{figure}
+
+\section{Conclusions}
+
+\section*{Acknowledgements}
+
+\bibliography{publications}
+
+\end{document}
