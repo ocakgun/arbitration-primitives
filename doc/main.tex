@@ -10,16 +10,16 @@
 
 \author{\IEEEauthorblockN{Andrey Mokhov\IEEEauthorrefmark{1}, Danil Sokolov, Victor Khomenko, Alex Yakovlev}
 \IEEEauthorblockA{Newcastle University, Newcastle upon Tyne, United Kingdom}
-\IEEEauthorblockA{\IEEEauthorrefmark{1}\emph{Corresponding author:} \url{andrey.mokhov@ncl.ac.uk}}}
+\IEEEauthorblockA{\IEEEauthorrefmark{1}\emph{Corresponding author}: \url{andrey.mokhov@ncl.ac.uk}}}
 
 \maketitle
 
 \begin{abstract}
-This paper presents an overview of a family of asynchronous arbitration
-primitives designed to increase the resilience and efficiency of
-the new generation of circuits and systems. We cover primitives for
-interfacing analog and digital worlds, sampling of non-persistent
-signals, and efficient handling of correlated sensor events.
+This paper presents an overview of a family of asynchronous arbitration primitives designed
+to increase the resilience and efficiency of the new generation of circuits and systems.
+We cover primitives for synchronisation and decision-making with an emphasis on interfacing
+analog and digital worlds, sampling of non-persistent signals, and efficient handling of
+correlated sensor events.
 \end{abstract}
 
 % no keywords
@@ -30,34 +30,80 @@ The new generation of circuits and systems is breaking conventional walls betwee
 different timing, voltage and technology domains. Modern `synchronous' and `digital'
 systems are emphatically asynchronous-at-large and analog-at-heart: they contain tens
 to hundreds of timing and voltage domains, some even thousands~\cite{2017_bohnenstiehl_kilocore}.
-Asynchronous circuits are now used both to orchestrate the communication between different clock
-domains~\cite{2017_jiang_noc} and to control the analog-digital interfaces in on-chip power
-regulators~\cite{2017_sokolov_a4a}.
+Asynchronous arbitration primitives are now used both to orchestrate the communication
+between different clock domains~\cite{2017_jiang_noc} and to control the analog-digital
+interfaces in on-chip power regulators~\cite{2017_sokolov_a4a}.
 
-A2A component\\
-Formal methods\\
-EDA support\\
+% Asynchronous arbitration primitives are key to the
+% resilience and efficiency of these systems.
 
-\subsection{STG specification language}
+This paper presents an overview of the recently developed asynchronous arbitration
+primitives that address the problem of interfacing between hazardous and/or analog
+worlds and hazard-free asynchronous circuits in a safe way. We cover synchronisation and
+decision-making primitives in Sections~\ref{sec-sync} and~\ref{sec-decision}, respectively.
+All of the presented circuit specifications and implementations have beed developed using
+the open-source asynchronous design tool \textsc{Workcraft}~\cite{Workcraft_website} and are
+publicly available under the MIT license~\cite{Arbitration_primitives_github}.
 
-Brief description\\
+% Asynchronous arbiters are notoriously difficult to design, therefore it is essential to
+% use a formal methods for the specification and verification of the ...
 
-Input/internal/output convention\\
+In the next subsection we briefly review the language for the formal specification
+of asynchronous circuits, which is used throughout the paper.
 
-Signal transition loop\\
+\subsection*{STG specification language}\label{sec-stg}
 
-non-persistence\\
+Signal Transition Graphs~(STGs) are commonly used for the specification,
+verification and synthesis of asynchronous circuits. See a comprehensive
+background on STGs in~\cite{2002_cortadella_book}.
 
-Handshake\\
+As a brief introduction, let us examine the STG specification shown in
+Fig.~\ref{fig:wait}(left, middle). The STG formally specifies the behaviour
+of an asynchronous circuit with three signals: inputs \textsf{sig} and \textsf{ctrl},
+and output \textsf{san}. Rising and falling \emph{signal transitions} are depicted by text
+nodes, e.g. \textsf{sig+} corresponds to signal \textsf{sig} switching from~0 to~1;
+\emph{dummy transitions}, such as \textsf{e} do not correspond to signal changes.
+Input, output and dummy transitions are conventionally shown in red, blue and black
+colour, respectively. Directed arcs between nodes express the precedence relation
+between transitions; for example, the arc between \textsf{san+} and \textsf{ctrl-} indicates
+that the input \textsf{ctrl} goes low only after output \textsf{san} goes high.
+An arc can be \emph{marked} with a \emph{token} (shown as a black dot) to specify
+the initial state of the circuit: the tokens before transitions \textsf{sig+} and
+\textsf{ctrl+} imply the initial state \textsf{sig=ctrl=san=0}. Undirected arcs (called
+\emph{read arcs}) are used to test the existence of a token in a \emph{place} (shown as
+a circle with or without token). For example, the read arc between place \textsf{sig1}
+and dummy transition \textsf{e} allows the latter to occur only in the state \textsf{sig=1}.
 
-Dummy\\
+The semantics of STGs will be further clarified on specific examples of asynchronous
+circuits.
 
-\section{Synchronisation primitives}
+% Signal transition loop\\
+% non-persistence\\
+% Handshake\\
+
+\begin{figure}
+\begin{center}
+    \includegraphics[scale=0.23]{fig/WAIT.pdf}
+    \caption{\textsf{WAIT} and \textsf{WAIT0}: block diagram,
+    specification and implementation.}
+    \label{fig:wait}
+\end{center}
+\end{figure}
+
+\section{Synchronisation primitives}\label{sec-sync}
 
 In this section we cover \emph{synchronisation primitives} that are used to
 isolate asynchronous control logic from potentially hazardous environment.
 
 \subsection{\textsf{WAIT} and \textsf{WAIT0}}
+
+\begin{figure*}
+\begin{center}
+    \includegraphics[scale=0.23]{fig/RWAIT.pdf}
+    \caption{\textsf{RWAIT}: block diagram, specification and implementation.}
+    \label{fig:rwait}
+\end{center}
+\end{figure*}
 
 The \textsf{WAIT} element~\cite{2015_sokolov_multiphase}, shown in Fig.~\ref{fig:wait}(left),
 synchronises the asynchronous handshake \textsf{ctrl/san} with the non-persistent
@@ -77,15 +123,6 @@ mode can be too short fot the \textsf{WAIT} element to register it, in which cas
 ignored. The non-persistent behaviour and the associated metastability is fully contained
 within the element, guaranteeing a clean hazard-free output.
 
-\begin{figure}
-\begin{center}
-    \includegraphics[scale=0.23]{fig/WAIT.pdf}
-    \caption{\textsf{WAIT} and \textsf{WAIT0}: block diagram,
-    specification and implementation.}
-    \label{fig:wait}
-\end{center}
-\end{figure}
-
 The implementation is based on the \emph{mutual-exclusion (ME)
 element}~\cite{2008_kinniment_synchronisation}, which is well-known and extensively
 studied by the asynchronous circuit design community.
@@ -97,14 +134,6 @@ called \textsf{WAIT0}; its top-level block diagram, the STG specification and
 the implementation are shown in Fig.~\ref{fig:wait}(right).
 
 \subsection{\textsf{RWAIT} and \textsf{RWAIT0}}
-
-\begin{figure*}
-\begin{center}
-    \includegraphics[scale=0.23]{fig/RWAIT.pdf}
-    \caption{\textsf{RWAIT}: block diagram, specification and implementation.}
-    \label{fig:rwait}
-\end{center}
-\end{figure*}
 
 \textsf{RWAIT} and \textsf{RWAIT0} are modifications of the \textsf{WAIT} and \textsf{WAIT0}
 elements, respectively, with a possibility to persistently cancel the waiting request. This
@@ -149,7 +178,7 @@ the other.
 \end{center}
 \end{figure}
 
-\section{Decision-making primitives}
+\section{Decision-making primitives}\label{sec-decision}
 
 This section presents a family of \emph{decision-making} components that perform
 non-trivial event arbitration and coordination tasks and rely on the previously
