@@ -49,43 +49,44 @@ publicly available under the MIT license~\cite{Arbitration_primitives_github}.
 % Below we review the language for the formal specification
 % of asynchronous circuits, which is used throughout the paper.
 
-\subsection*{STG specification language}\label{sec-stg}
+\subsection*{Formal specification of asynchronous circuits}\label{sec-stg}
 
 Signal Transition Graphs~(STGs) are commonly used for the specification,
 verification and synthesis of asynchronous circuits. See a comprehensive
 background on STGs in~\cite{2002_cortadella_book}.
 
 As a brief introduction, let us examine the STG specification shown in
-Fig.~\ref{fig:wait}(left/middle). The STG specifies the behaviour
-of a circuit with inputs $\{\textsf{sig}, \textsf{ctrl}\}$
-and output \textsf{san}. Rising and falling \emph{signal transitions} are depicted by text
-nodes, e.g. \textsf{sig+} corresponds to signal \textsf{sig} switching from~0 to~1.
+Fig.~\ref{fig:wait}(left-middle). The STG specifies the behaviour
+of a circuit with the inputs $\{\textsf{sig}, \textsf{ctrl}\}$
+and the output \textsf{san}. Rising and falling \emph{signal transitions} are depicted by text
+nodes, e.g. \textsf{sig+} corresponds to the signal \textsf{sig} switching from~0 to~1.
 There are also \emph{dummy transitions}, such as \textsf{e}, which do not correspond to
 changes of signal values (think of them as abstract events).
 Input, output and dummy transitions are conventionally shown in red, blue and black
 colour, respectively.
 
-Directed arcs between nodes express the \emph{precedence} relation
-between transitions, e.g. arc $\textsf{san+} \longrightarrow \textsf{ctrl-}$ indicates
-that input \textsf{ctrl} goes low only after output \textsf{san} goes high.
+Directed arcs express the \emph{precedence} relation
+between transitions, e.g. the arc $\textsf{san+} \longrightarrow \textsf{ctrl-}$ indicates
+that the input \textsf{ctrl} goes low only after the output \textsf{san} goes high.
 An arc can be \emph{marked} with a \emph{token}, shown as a black dot, to specify
-the initial state of the circuit: the tokens before transitions \textsf{sig+} and
+the initial state of the circuit: the tokens before the transitions \textsf{sig+} and
 \textsf{ctrl+} imply the initial state \textsf{sig=ctrl=san=0}.
 
 A transition is \emph{enabled} to occur if it has tokens on each of its incoming
 arcs, otherwise it is \emph{disabled}, e.g. \textsf{ctrl+} is enabled and \textsf{san-}
 is disabled. When a transition occurs, it \emph{consumes} the tokens on its incoming arcs
-are \emph{produces} them on its outgoing arcs, e.g. \textsf{ctrl+} moves the token to arc
-$\textsf{ctrl+} \longrightarrow \textsf{e}$. Undirected arcs, called
+are \emph{produces} them on its outgoing arcs, e.g. \textsf{ctrl+} moves the token to the
+arc~$\textsf{ctrl+} \longrightarrow \textsf{e}$. Undirected arcs, called
 \emph{read arcs}, are used to \emph{test} the existence of a token in a \emph{place}, shown as
 a circle (think of it just as a placeholder for a token), e.g. the read arc
-$\textsf{sig1} \frac{~~~~}{~} \textsf{e}$ allows the latter to occur only if the place
-is marked, i.e. if \textsf{sig=1}.
+$\textsf{sig1} \frac{~~~~}{~} \textsf{e}$ allows the dummy \textsf{e} to occur only if
+the place is marked, i.e. if \textsf{sig=1}.
 
-A transition is \emph{persistent} if, once enabled, it will occur without becoming
-disabled again. Non-persistence in an STG specification
-often manifests itself as a \emph{hazard} in the circuit implementation, where a signal
-can start switching from~0 to~1 but is stopped midway resulting in a short analog pulse.
+A transition is \emph{persistent} if, once enabled, it will occur without first becoming
+disabled. The dummy \textsf{e} is the only \emph{non-persistent} transition in the
+example: \textsf{sig-} can disable it by consuming the token from \textsf{sig1}. Non-persistence
+can manifest itself as a \emph{hazard} in the circuit, whereby a gate starts
+switching but is stopped midway resulting in a short analog pulse.
 
 % Signal transition loop\\
 % Handshake\\
@@ -112,8 +113,10 @@ from the environment.
 \begin{figure*}
 \begin{center}
     \includegraphics[scale=0.23]{fig/RWAIT.pdf}
+    \vspace{-2.5mm}
     \caption{\textsf{RWAIT}: block diagram, specification and implementation.}
     \label{fig:rwait}
+    \vspace{-5.5mm}
 \end{center}
 \end{figure*}
 
@@ -123,21 +126,18 @@ input~\textsf{sig}. According to the STG specification, \textsf{sig} is unconstr
 is allowed to switch between~0 and~1 values with no regard to the output handshake -- this
 is captured by the loop with signal transitions \textsf{sig+} and \textsf{sig-}.
 Initially~\textsf{ctrl=0} and the input is isolated from the output \textsf{san}.
-By raising the~\textsf{ctrl} input, the element is switched into the \emph{waiting mode},
-where it stays until~\textsf{sig} becomes high. The~\textsf{sig=1} condition enables the dummy
-transition~\textsf{e} to fire (via the read arc), thus the output~\textsf{san=1} is produced
-and is persistently held\footnote{Here and further on, the output \textsf{san}
+By switching the~\textsf{ctrl} input, the element is switched into the \emph{waiting mode},
+where it stays until~\textsf{sig} becomes high and enables the
+dummy~\textsf{e}. The output~\textsf{san=1} is then produced and persistently
+held\footnote{Here and further on, the output \textsf{san}
 is the `sanitised' (persistent) version of the `dirty' (non-persistent) input \textsf{sig}.}
-until \textsf{WAIT} is reset by releasing the control input (transition~\textsf{ctrl-}).
+until \textsf{WAIT} is reset by releasing the \textsf{ctrl} input (the transition~\textsf{ctrl-}).
 
 Note that an input spike (\textsf{sig+} followed by \textsf{sig-}) in the waiting
-mode can be too short fot the \textsf{WAIT} element to register it, in which case it is
-ignored. The non-persistent behaviour and the associated metastability is fully contained
-within the element, guaranteeing a clean hazard-free output.
-
-The implementation is based on the \emph{mutual-exclusion (ME)
-element}~\cite{2008_kinniment_synchronisation}, which is well-known and extensively
-studied by the asynchronous circuit design community.
+mode can be too short fot the \textsf{WAIT} element to register it, in which case the spike
+is ignored. The non-persistent behaviour and the associated metastability is fully contained
+within the element, guaranteeing a clean hazard-free output. This is achieved using the
+\emph{mutual-exclusion (ME) element}~\cite{2008_kinniment_synchronisation}.
 
 \textsf{WAIT} is a fundamental synchronisation primitive that is used for
 implementing other, more sophisticated components presented in this paper.
@@ -152,43 +152,54 @@ elements, respectively, with a possibility to persistently cancel the waiting re
 is useful when the input is no longer expected to change or the change is no longer relevant
 for the asynchronous controller, and hence the output handshake needs to be released.
 
-The top-level diagram of \textsf{RWAIT} is shown in Fig.~\ref{fig:rwait}. The additional input
+See the block diagram of \textsf{RWAIT} in Fig.~\ref{fig:rwait}. The additional input
 \textsf{frc} can be used to force the reset of the output handshake in the waiting mode. The
-STG specification highlights the fact that the transition \textsf{san+} can be caused either by
-\textsf{sig+} or \textsf{frc+}. The implementation reflects the resulting
-OR-causality~\cite{1996_yakovlev_or}: inputs \textsf{sig} and \textsf{frc} are simply combined
-via a NOR gate, whose output is synchronised with the asynchronous handshake \textsf{ctrl/san}
+STG specifies that the output transition \textsf{san+} can be caused either by~\textsf{sig+}
+(the top branch) or by~\textsf{frc+}~(the bottom branch). The implementation reflects the resulting
+OR-causality~\cite{1996_yakovlev_or}: the inputs \textsf{sig} and \textsf{frc} are simply
+combined via a NOR gate, whose output is synchronised with the handshake \textsf{ctrl/san}
 using the \textsf{WAIT0} element.
 
-The \textsf{RWAIT0} element is implemented analogously.
+% The \textsf{RWAIT0} element is implemented analogously.
 
 \subsection{\textsf{WAIT01} and \textsf{WAIT10}}
 
 \textsf{WAIT01} and \textsf{WAIT10} elements wait for a rising or falling edge of the input
-signal, respectively. Note, this is subtly different from waiting for high or low input value,
+signal, respectively. Note that this is subtly different from waiting for high or low input value,
 e.g. a signal can be initially low, and to generate a falling edge event it must first go high.
+The \textsf{WAIT01} specification in Fig.~\ref{fig:wait012}(left-middle) tracks the input changes
+via two dummy transitions that are enabled in sequence when \textsf{sig=0} and \textsf{sig=1} hold.
+This can be implemented by connecting \textsf{WAIT0} and \textsf{WAIT} in sequence.
+
+An element waiting for an arbitrary fixed pattern of values, e.g. the symmetric
+\textsf{WAIT10}, can be implemented analogously.
 
 \begin{figure}
 \begin{center}
-    \includegraphics[scale=0.23]{fig/WAIT01.pdf}
-    \caption{\textsf{WAIT01}: block diagram and implementation.}
-    \label{fig:wait01}
+    \includegraphics[scale=0.23]{fig/WAIT01-and-WAIT2.pdf}
+    \caption{\textsf{WAIT01} and \textsf{WAIT2}: block diagram,
+    specification, implementation.}
+    \label{fig:wait012}
+    \vspace{-4mm}
 \end{center}
 \end{figure}
 
 \subsection{\textsf{WAIT2}}
-\textsf{WAIT2} is a combination of \textsf{WAIT} and \textsf{WAIT0} elements:
+\textsf{WAIT2} is another combination of \textsf{WAIT} and \textsf{WAIT0} elements:
 it uses a 2-phase output handshake, waiting for high and low input values, one after
-the other.
+the other, see Fig.~\ref{fig:wait012}(right).
 
-\begin{figure}
-\begin{center}
-    \includegraphics[scale=0.23]{fig/WAIT2.pdf}
-    \caption{\textsf{WAIT2}: block diagram and conceptual design (top left and right),
-    and implementation (bottom).}
-    \label{fig:wait2}
-\end{center}
-\end{figure}
+The STG contains two loops: the inner \textsf{sig} loop, which is unconstrained, and
+the outer handshake loop that synchronises the rising
+($\textsf{ctrl+} \longrightarrow \textsf{san+}$)
+ and the falling
+($\textsf{ctrl-} \longrightarrow \textsf{san-}$)
+phases with conditions \textsf{sig=1} and \textsf{sig=0}, respectively.
+
+The implementation uses a toggle-like component \textsf{T}, which steers the rising and
+falling edges of \textsf{ctrl} to the two four-phase output handshakes controlling
+the \textsf{WAIT} and \textsf{WAIT0} elements. It is a standard
+asynchronous component, and its implementation is beyond the scope of this paper.
 
 \section{Decision-making primitives}\label{sec-decision}
 
@@ -200,16 +211,6 @@ introduced synchronisation primitives.
 \subsection{WAITX2}
 \subsection{SAMPLE}
 \subsection{OM}
-
-% \begin{figure}[h!]
-% \begin{center}
-%   \includegraphics[width=0.84\linewidth]{FIG/ope-chip.pdf}
-%   \vspace{-3mm}
-%   \caption{Resiliency of asynchronous control under unstable voltage.}
-%   \label{fig:voltage-resiliency}
-% \end{center}
-% \vspace{-7mm}
-% \end{figure}
 
 \section{Conclusions}
 
