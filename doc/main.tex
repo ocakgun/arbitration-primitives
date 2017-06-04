@@ -113,10 +113,10 @@ from the environment.
 \begin{figure*}
 \begin{center}
     \includegraphics[scale=0.23]{fig/RWAIT.pdf}
-    \vspace{-2.5mm}
+    \vspace{-1mm}
     \caption{\textsf{RWAIT}: block diagram, specification and implementation.}
     \label{fig:rwait}
-    \vspace{-5.5mm}
+    \vspace{-5mm}
 \end{center}
 \end{figure*}
 
@@ -137,7 +137,7 @@ Note that an input spike (\textsf{sig+} followed by \textsf{sig-}) in the waitin
 mode can be too short fot the \textsf{WAIT} element to register it, in which case the spike
 is ignored. The non-persistent behaviour and the associated metastability is fully contained
 within the element, guaranteeing a clean hazard-free output. This is achieved using the
-\emph{mutual-exclusion (ME) element}~\cite{2008_kinniment_synchronisation}.
+\emph{mutual-exclusion} \textsf{ME} element~\cite{2008_kinniment_synchronisation}.
 
 \textsf{WAIT} is a fundamental synchronisation primitive that is used for
 implementing other, more sophisticated components presented in this paper.
@@ -201,20 +201,88 @@ falling edges of \textsf{ctrl} to the two four-phase output handshakes controlli
 the \textsf{WAIT} and \textsf{WAIT0} elements. It is a standard
 asynchronous component, and its implementation is beyond the scope of this paper.
 
+\begin{figure*}
+\begin{center}
+    \includegraphics[scale=0.23]{fig/WAITX.pdf}
+    \vspace{-2mm}
+    \caption{\textsf{WAITX}: block diagram, specification and implementation.}
+    \label{fig:waitx}
+    \vspace{-4mm}
+\end{center}
+\end{figure*}
+
 \section{Decision-making primitives}\label{sec-decision}
 
 This section presents a family of \emph{decision-making} components that perform
-non-trivial event arbitration and coordination tasks and rely on the previously
-introduced synchronisation primitives.
+non-trivial event coordination and rely on the previously introduced synchronisation
+primitives.
 
 \subsection{WAITX}
+
+The \textsf{WAITX} element~\cite{2017_khomenko_waitx} arbitrates between two
+non-persistent inputs $\{\textsf{sig1}, \textsf{sig2}\}$, producing a clean
+asynchronous dual-rail handshake: depending on which of the two signals arrives
+first, exactly one of the grant signals $\{\textsf{g1}, \textsf{g2}\}$ is issued, see
+Fig.~\ref{fig:waitx}. \textsf{WAITX} isolates the outputs both from the metastability
+associated with non-persistent inputs, as well as from the metastability associated
+with making the decision of which signal goes high first.
+
+The implementation relies on \textsf{RWAIT} elements for synchronisation with
+non-persistent signals, and uses an \textsf{ME} element to make the decision on their
+arrival order.
+
 \subsection{WAITX2}
+
+\textsf{WAITX2} behaves as \textsf{WAITX} in the rising phase and as
+\textsf{WAIT0} in the falling phase, i.e. it does not release the
+output asynchronous handshake until the winning input
+signal goes low. It uses a 2-phase output handshake
+similarly to \textsf{WAIT2}.
+
 \subsection{SAMPLE}
+
+The purpose of \textsf{SAMPLE} is to check whether the voltage
+on a wire is above the threshold. Its notation and interface
+protocol are shown in Fig. 11, together with an implementation
+based on \textsf{WAITX}.
+
 \subsection{OM}
+
+The \emph{opportunistic merge} \textsf{OM} element~\cite{2015_mokhov_om} merges two
+request-acknowledgement channels $\{\textsf{r1}/\textsf{a1}, \textsf{r2}/\textsf{a2}\}$
+into one $\textsf{r}/\textsf{a}$ and can opportunistically bundle requests from different
+input channels if they arrive sufficiently close to each other.
+
+Fig.~\ref{fig:om}(middle) clarifies the difference between the standard \emph{merge}
+element~\cite{1999_greenstreet_merge} and \textsf{OM}. The conceptual state graph of
+the merge element is shown on the left. Note that the bottom state of the graph is not
+persistent: outputs \textsf{a1} and \textsf{a2} disable each other, hence this is a
+decision-making element. The state graph for OM, shown on the right, has an additional
+`opportunistic bundle' transition labelled by $\{\textsf{a1},\textsf{a2}\}$ that sends
+acknowledgements to both input channels.
+
+The intended application of OM is to handle concurrent (and potentially correlated) requests
+from several clients to a kind of service that benefits all the clients simultaneously. Examples
+include triggering an alarm by (any of) several sensors, re-charging of a shared DRAM, and
+various kinds of power management~\cite{2017_sokolov_a4a}. The STG specification of
+\textsf{OM}, as well as further implementation details can be found in~\cite{2015_mokhov_om}.
+
+\begin{figure}
+\begin{center}
+    \includegraphics[scale=0.32]{fig/OM.pdf}
+    \caption{\textsf{OM}: block diagram, conceptual state graphs,
+    implementation.}
+    \label{fig:om}
+    \vspace{-4mm}
+\end{center}
+\end{figure}
 
 \section{Conclusions}
 
 \section*{Acknowledgements}
+
+This research was supported by EPSRC grant EP/L025507/1 ``A4A: Asynchronous design
+for Analogue electronics''.
 
 \bibliographystyle{unsrt}
 \bibliography{publications}
