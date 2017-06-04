@@ -6,8 +6,7 @@
 \hyphenation{op-tical net-works semi-conduc-tor}
 
 \begin{document}
-\title{Asynchronous Arbitration Primitives\\for New Generation of Circuits and Systems}
-
+\title{Asynchronous Arbitration Primitives\\for New Generation of Circuits and Systems\vspace{-3mm}}
 \author{\IEEEauthorblockN{Andrey Mokhov\IEEEauthorrefmark{1}, Danil Sokolov, Victor Khomenko, Alex Yakovlev}
 \IEEEauthorblockA{Newcastle University, Newcastle upon Tyne, United Kingdom}
 \IEEEauthorblockA{\IEEEauthorrefmark{1}\emph{Corresponding author}: \url{andrey.mokhov@ncl.ac.uk}}}
@@ -47,9 +46,8 @@ publicly available under the MIT license~\cite{Arbitration_primitives_github}.
 
 % Asynchronous arbiters are notoriously difficult to design, therefore it is essential to
 % use a formal methods for the specification and verification of the ...
-
-In the next subsection we briefly review the language for the formal specification
-of asynchronous circuits, which is used throughout the paper.
+% Below we review the language for the formal specification
+% of asynchronous circuits, which is used throughout the paper.
 
 \subsection*{STG specification language}\label{sec-stg}
 
@@ -58,27 +56,38 @@ verification and synthesis of asynchronous circuits. See a comprehensive
 background on STGs in~\cite{2002_cortadella_book}.
 
 As a brief introduction, let us examine the STG specification shown in
-Fig.~\ref{fig:wait}(left, middle). The STG formally specifies the behaviour
-of an asynchronous circuit with three signals: inputs \textsf{sig} and \textsf{ctrl},
+Fig.~\ref{fig:wait}(left/middle). The STG specifies the behaviour
+of a circuit with inputs $\{\textsf{sig}, \textsf{ctrl}\}$
 and output \textsf{san}. Rising and falling \emph{signal transitions} are depicted by text
-nodes, e.g. \textsf{sig+} corresponds to signal \textsf{sig} switching from~0 to~1;
-\emph{dummy transitions}, such as \textsf{e} do not correspond to signal changes.
+nodes, e.g. \textsf{sig+} corresponds to signal \textsf{sig} switching from~0 to~1.
+There are also \emph{dummy transitions}, such as \textsf{e}, which do not correspond to
+changes of signal values (think of them as abstract events).
 Input, output and dummy transitions are conventionally shown in red, blue and black
-colour, respectively. Directed arcs between nodes express the precedence relation
-between transitions; for example, the arc between \textsf{san+} and \textsf{ctrl-} indicates
-that the input \textsf{ctrl} goes low only after output \textsf{san} goes high.
-An arc can be \emph{marked} with a \emph{token} (shown as a black dot) to specify
-the initial state of the circuit: the tokens before transitions \textsf{sig+} and
-\textsf{ctrl+} imply the initial state \textsf{sig=ctrl=san=0}. Undirected arcs (called
-\emph{read arcs}) are used to test the existence of a token in a \emph{place} (shown as
-a circle with or without token). For example, the read arc between place \textsf{sig1}
-and dummy transition \textsf{e} allows the latter to occur only in the state \textsf{sig=1}.
+colour, respectively.
 
-The semantics of STGs will be further clarified on specific examples of asynchronous
-circuits.
+Directed arcs between nodes express the \emph{precedence} relation
+between transitions, e.g. arc $\textsf{san+} \longrightarrow \textsf{ctrl-}$ indicates
+that input \textsf{ctrl} goes low only after output \textsf{san} goes high.
+An arc can be \emph{marked} with a \emph{token}, shown as a black dot, to specify
+the initial state of the circuit: the tokens before transitions \textsf{sig+} and
+\textsf{ctrl+} imply the initial state \textsf{sig=ctrl=san=0}.
+
+A transition is \emph{enabled} to occur if it has tokens on each of its incoming
+arcs, otherwise it is \emph{disabled}, e.g. \textsf{ctrl+} is enabled and \textsf{san-}
+is disabled. When a transition occurs, it \emph{consumes} the tokens on its incoming arcs
+are \emph{produces} them on its outgoing arcs, e.g. \textsf{ctrl+} moves the token to arc
+$\textsf{ctrl+} \longrightarrow \textsf{e}$. Undirected arcs, called
+\emph{read arcs}, are used to \emph{test} the existence of a token in a \emph{place}, shown as
+a circle (think of it just as a placeholder for a token), e.g. the read arc
+$\textsf{sig1} \frac{~~~~}{~} \textsf{e}$ allows the latter to occur only if the place
+is marked, i.e. if \textsf{sig=1}.
+
+A transition is \emph{persistent} if, once enabled, it will occur without becoming
+disabled again. Non-persistence in an STG specification
+often manifests itself as a \emph{hazard} in the circuit implementation, where a signal
+can start switching from~0 to~1 but is stopped midway resulting in a short analog pulse.
 
 % Signal transition loop\\
-% non-persistence\\
 % Handshake\\
 
 \begin{figure}
@@ -87,13 +96,16 @@ circuits.
     \caption{\textsf{WAIT} and \textsf{WAIT0}: block diagram,
     specification and implementation.}
     \label{fig:wait}
+    \vspace{-4mm}
 \end{center}
 \end{figure}
 
 \section{Synchronisation primitives}\label{sec-sync}
 
-In this section we cover \emph{synchronisation primitives} that are used to
-isolate asynchronous control logic from potentially hazardous environment.
+This section covers the primitives for the synchronisation of hazard-free signal
+transitions in asynchronous circuits with potentially hazardous signals coming
+from the environment.
+% Note: we use terms `hazard-free' and `persistent' as synonyms.
 
 \subsection{\textsf{WAIT} and \textsf{WAIT0}}
 
