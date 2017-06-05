@@ -26,7 +26,7 @@ correlated sensor events.
 \section{Introduction}
 
 The new generation of circuits and systems is breaking conventional walls between
-different timing, voltage and technology domains. Modern `synchronous' and `digital'
+different timing, power and technology domains. Modern `synchronous' and `digital'
 systems are emphatically asynchronous-at-large and analog-at-heart: they contain tens
 to hundreds of timing and voltage domains, some even thousands~\cite{2017_bohnenstiehl_kilocore}.
 Asynchronous arbitration primitives are now used both to orchestrate the communication
@@ -108,7 +108,7 @@ transitions in asynchronous circuits with potentially hazardous signals coming
 from the environment.
 % Note: we use terms `hazard-free' and `persistent' as synonyms.
 
-\subsection{\textsf{WAIT} and \textsf{WAIT0}}
+\subsection*{\textsf{WAIT} and \textsf{WAIT0}}
 
 \begin{figure*}
 \begin{center}
@@ -145,7 +145,7 @@ The symmetric version of the element that waits for the input to become low is
 called \textsf{WAIT0}; its top-level block diagram, the STG specification and
 the implementation are shown in Fig.~\ref{fig:wait}(right).
 
-\subsection{\textsf{RWAIT} and \textsf{RWAIT0}}
+\subsection*{\textsf{RWAIT} and \textsf{RWAIT0}}
 
 \textsf{RWAIT} and \textsf{RWAIT0} are modifications of the \textsf{WAIT} and \textsf{WAIT0}
 elements, respectively, with a possibility to persistently cancel the waiting request. This
@@ -162,7 +162,7 @@ using the \textsf{WAIT0} element.
 
 % The \textsf{RWAIT0} element is implemented analogously.
 
-\subsection{\textsf{WAIT01} and \textsf{WAIT10}}
+\subsection*{\textsf{WAIT01} and \textsf{WAIT10}}
 
 \textsf{WAIT01} and \textsf{WAIT10} elements wait for a rising or falling edge of the input
 signal, respectively. Note that this is subtly different from waiting for high or low input value,
@@ -184,7 +184,8 @@ An element waiting for an arbitrary fixed pattern of values, e.g. the symmetric
 \end{center}
 \end{figure}
 
-\subsection{\textsf{WAIT2}}
+\subsection*{\textsf{WAIT2}}
+
 \textsf{WAIT2} is another combination of \textsf{WAIT} and \textsf{WAIT0} elements:
 it uses a 2-phase output handshake, waiting for high and low input values, one after
 the other, see Fig.~\ref{fig:wait012}(right).
@@ -217,7 +218,7 @@ This section presents a family of \emph{decision-making} components that perform
 non-trivial event coordination and rely on the previously introduced synchronisation
 primitives.
 
-\subsection{\textsf{WAITX}}
+\subsection*{\textsf{WAITX}}
 
 The \textsf{WAITX} element~\cite{2017_khomenko_waitx} arbitrates between two
 non-persistent inputs $\{\textsf{sig1}, \textsf{sig2}\}$, producing a clean
@@ -236,7 +237,7 @@ The implementation relies on \textsf{RWAIT} elements for synchronisation with
 non-persistent signals, and uses an \textsf{ME} element to make the decision on their
 arrival order.
 
-\subsection{\textsf{WAITX2}}
+\subsection*{\textsf{WAITX2}}
 
 \begin{figure}
 \begin{center}
@@ -260,7 +261,7 @@ reset phase. The synthesis and technology mapping of the control was performed u
 conventional asynchronous design approaches automated in
 \textsc{Workcraft}~\cite{2017_sokolov_a4a}.
 
-\subsection{\textsf{SAMPLE}}
+\subsection*{\textsf{SAMPLE}}
 
 \begin{figure}
 \begin{center}
@@ -281,7 +282,7 @@ The implementation is based on \textsf{WAITX} that decides which of the two inpu
 high at the same time, e.g. during a transition of \textsf{sig}, in which case
 \textsf{SAMPLE} is allowed to make an arbitrary decision.
 
-\subsection{\textsf{OM}}
+\subsection*{\textsf{OM}}
 
 The \emph{opportunistic merge} \textsf{OM} element~\cite{2015_mokhov_om} merges two
 request-acknowledgement channels $\{\textsf{r1}/\textsf{a1}, \textsf{r2}/\textsf{a2}\}$
@@ -325,8 +326,8 @@ where resilient and efficient synchronisation between multiple clock and voltage
 domains is an important challenge.
 The primitives were developed using formal methods and are publicly
 available~\cite{Arbitration_primitives_github}. Our current research is focused
-on providing support for their automated insertion into asynchronous circuits operating
-on the boundary with hazardous environment.
+on providing support for their automated insertion into asynchronous controllers
+operating on the boundary with hazardous environment.
 
 % them into the asynchronous design flow supported by \textsc{Workcraft}
 
