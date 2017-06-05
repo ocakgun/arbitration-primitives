@@ -207,7 +207,7 @@ asynchronous component, and its implementation is beyond the scope of this paper
     \vspace{-2mm}
     \caption{\textsf{WAITX}: block diagram, specification and implementation.}
     \label{fig:waitx}
-    \vspace{-4mm}
+    \vspace{-6mm}
 \end{center}
 \end{figure*}
 
@@ -217,36 +217,71 @@ This section presents a family of \emph{decision-making} components that perform
 non-trivial event coordination and rely on the previously introduced synchronisation
 primitives.
 
-\subsection{WAITX}
+\subsection{\textsf{WAITX}}
 
 The \textsf{WAITX} element~\cite{2017_khomenko_waitx} arbitrates between two
 non-persistent inputs $\{\textsf{sig1}, \textsf{sig2}\}$, producing a clean
 asynchronous dual-rail handshake: depending on which of the two signals arrives
 first, exactly one of the grant signals $\{\textsf{g1}, \textsf{g2}\}$ is issued, see
-Fig.~\ref{fig:waitx}. \textsf{WAITX} isolates the outputs both from the metastability
-associated with non-persistent inputs, as well as from the metastability associated
-with making the decision of which signal goes high first.
+Fig.~\ref{fig:waitx}. The place \textsf{me} with two consuming arcs represents to
+the arbitration decision that needs to be made: if the inputs arrive very close to
+each other, both of the two dummy transitions can become enabled but only one
+of them can occur, since \textsf{me} can have at most one token. In the reset phase
+both branches are merged in the place \textsf{mrg}.
 
+\textsf{WAITX} isolates the outputs
+both from the metastability associated with non-persistent inputs, as well as from
+the metastability associated with making the decision of which input signal arrives first.
 The implementation relies on \textsf{RWAIT} elements for synchronisation with
 non-persistent signals, and uses an \textsf{ME} element to make the decision on their
 arrival order.
 
-\subsection{WAITX2}
+\subsection{\textsf{WAITX2}}
 
-\textsf{WAITX2} behaves as \textsf{WAITX} in the rising phase and as
-\textsf{WAIT0} in the falling phase, i.e. it does not release the
-output asynchronous handshake until the winning input
-signal goes low. It uses a 2-phase output handshake
-similarly to \textsf{WAIT2}.
+\begin{figure}
+\begin{center}
+    \vspace{-2mm}
+    \includegraphics[scale=0.23]{fig/WAITX2.pdf}
+    \caption{\textsf{WAITX2}: block diagram, specification and implementation.}
+    \label{fig:waitx2}
+    \vspace{-5mm}
+\end{center}
+\end{figure}
 
-\subsection{SAMPLE}
+\textsf{WAITX2} behaves as \textsf{WAITX} in the rising phase and as \textsf{WAIT0}
+in the falling phase, i.e. it does not release the output asynchronous handshake until
+the winning input signal goes low. It uses a 2-phase output handshake similarly to
+\textsf{WAIT2}, and the specification, shown in Fig.~\ref{fig:waitx2}, is therefore
+a combination of the STGs for \textsf{WAITX} and \textsf{WAIT2}.
 
-The purpose of \textsf{SAMPLE} is to check whether the voltage
-on a wire is above the threshold. Its notation and interface
-protocol are shown in Fig. 11, together with an implementation
-based on \textsf{WAITX}.
+The implementation comprises \textsf{WAITX} and two \textsf{WAIT0} elements controlled
+by toggle-like asynchronous logic, which activates the right \textsf{WAIT0} element in the
+reset phase. The synthesis and technology mapping of the control was performed using
+conventional asynchronous design approaches automated in
+\textsc{Workcraft}~\cite{2017_sokolov_a4a}.
 
-\subsection{OM}
+\subsection{\textsf{SAMPLE}}
+
+\begin{figure}
+\begin{center}
+    \includegraphics[scale=0.23]{fig/SAMPLE.pdf}
+    \caption{\textsf{SAMPLE}: block diagram, specification and implementation.}
+    \label{fig:sample}
+    \vspace{-6mm}
+\end{center}
+\end{figure}
+
+The purpose of the \textsf{SAMPLE} element is to check whether the voltage on the input
+\textsf{sig} is above the threshold, see Fig.~\ref{fig:sample}. The specification is similar
+to that of \textsf{WAITX} but the two dummy transitions are controlled by conditions
+corresponding to the state of the same signal.
+
+The implementation is based on \textsf{WAITX} that decides which of the two inputs,
+\textsf{sig} or its inverted version, becomes high first. Note that both inputs may be
+high at the same time, e.g. during a transition of \textsf{sig}, in which case
+\textsf{SAMPLE} is allowed to make an arbitrary decision.
+
+\subsection{\textsf{OM}}
 
 The \emph{opportunistic merge} \textsf{OM} element~\cite{2015_mokhov_om} merges two
 request-acknowledgement channels $\{\textsf{r1}/\textsf{a1}, \textsf{r2}/\textsf{a2}\}$
@@ -257,29 +292,46 @@ Fig.~\ref{fig:om}(middle) clarifies the difference between the standard \emph{me
 element~\cite{1999_greenstreet_merge} and \textsf{OM}. The conceptual state graph of
 the merge element is shown on the left. Note that the bottom state of the graph is not
 persistent: outputs \textsf{a1} and \textsf{a2} disable each other, hence this is a
-decision-making element. The state graph for OM, shown on the right, has an additional
+decision-making element. The state graph for \textsf{OM}, shown on the right, has an additional
 `opportunistic bundle' transition labelled by $\{\textsf{a1},\textsf{a2}\}$ that sends
 acknowledgements to both input channels.
 
-The intended application of OM is to handle concurrent (and potentially correlated) requests
+The intended application of \textsf{OM} is to handle concurrent (and potentially correlated) requests
 from several clients to a kind of service that benefits all the clients simultaneously. Examples
 include triggering an alarm by (any of) several sensors, re-charging of a shared DRAM, and
 various kinds of power management~\cite{2017_sokolov_a4a}. The STG specification of
 \textsf{OM}, as well as further implementation details can be found in~\cite{2015_mokhov_om}.
 
+The input channels of \textsf{OM} are assumed to be hazard-free, but one can use one of the
+synchronisation primitives presented in Section~\ref{sec-sync} to generate a clean hazard-free
+handshake from a hazardous input signal, e.g. produced by an analog sensor.
+
 \begin{figure}
 \begin{center}
+    \vspace{-1mm}
     \includegraphics[scale=0.32]{fig/OM.pdf}
     \caption{\textsf{OM}: block diagram, conceptual state graphs,
     implementation.}
     \label{fig:om}
-    \vspace{-4mm}
+    \vspace{-6.5mm}
 \end{center}
 \end{figure}
 
 \section{Conclusions}
 
+The paper presented an overview of asynchronous arbitration primitives that can
+be used as basic building blocks for the new generation of circuits and systems,
+where resilient and efficient synchronisation between multiple clock and voltage
+domains is an important challenge.
+The primitives were developed using formal methods and are publicly
+available~\cite{Arbitration_primitives_github}. Our current research is focused
+on providing support for their automated insertion into asynchronous circuits operating
+on the boundary with hazardous environment.
+
+% them into the asynchronous design flow supported by \textsc{Workcraft}
+
 \section*{Acknowledgements}
+\vspace{-0.5mm}
 
 This research was supported by EPSRC grant EP/L025507/1 ``A4A: Asynchronous design
 for Analogue electronics''.
