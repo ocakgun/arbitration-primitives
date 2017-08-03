@@ -13,7 +13,7 @@
    font-weight="normal"
    height="534.83502"
    stroke-miterlimit="10"
-   width="2579.7593"
+   width="2539.7593"
    id="svg2"
    version="1.1"
    inkscape:version="0.91 r13725"
@@ -40,8 +40,8 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1445"
-     inkscape:window-height="841"
+     inkscape:window-width="1858"
+     inkscape:window-height="1177"
      id="namedview141"
      showgrid="false"
      fit-margin-top="5"
@@ -49,9 +49,9 @@
      fit-margin-right="5"
      fit-margin-bottom="5"
      inkscape:zoom="0.3579029"
-     inkscape:cx="887.23541"
-     inkscape:cy="130.83049"
-     inkscape:window-x="83"
+     inkscape:cx="1167.5962"
+     inkscape:cy="111.27209"
+     inkscape:window-x="1974"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg2" />
@@ -76,7 +76,7 @@
   </defs>
   <g
      id="g4501"
-     transform="translate(1.4863281e-4,-52.110418)">
+     transform="translate(-39.999851,-52.110418)">
     <g
        transform="matrix(70,0,0,70,2247.5653,269.97843)"
        id="g7"
@@ -481,7 +481,7 @@
      height="247.8"
      width="420" />
   <g
-     transform="translate(608.50423,-12.8929)"
+     transform="translate(588.50423,-12.8929)"
      id="g5">
     <g
        style="font-size:0.75px;font-family:sans-serif;fill:#b20000;stroke:#b20000"

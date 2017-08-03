@@ -38,7 +38,12 @@ interfaces in on-chip power regulators~\cite{2017_sokolov_a4a}.
 
 This paper presents an overview of the recently developed asynchronous arbitration
 primitives that address the problem of interfacing between hazardous and/or analog
-worlds and hazard-free asynchronous circuits in a safe way. We cover synchronisation and
+worlds and hazard-free asynchronous circuits in a safe way. The primitives are
+also useful in purely digital settings, as they increase the robustness of event-driven
+asynchronous circuits by shortening their \emph{event sensitivity interval}, where an unexpected
+event, e.g. caused by a particle strike, can corrupt the state of the system.
+
+We cover synchronisation and
 decision-making primitives in Sections~\ref{sec-sync} and~\ref{sec-decision}, respectively.
 All of the presented circuit specifications and implementations have beed developed using
 the open-source asynchronous design tool \textsc{Workcraft}~\cite{Workcraft_website} and are
@@ -94,10 +99,11 @@ switching but is stopped midway resulting in a short analog pulse.
 \begin{figure}
 \begin{center}
     \includegraphics[scale=0.23]{fig/WAIT.pdf}
+    \vspace{-6mm}
     \caption{\textsf{WAIT} and \textsf{WAIT0}: block diagram,
     specification and implementation.}
     \label{fig:wait}
-    \vspace{-4mm}
+    \vspace{-6mm}
 \end{center}
 \end{figure}
 
@@ -180,7 +186,7 @@ An element waiting for an arbitrary fixed pattern of values, e.g. the symmetric
     \caption{\textsf{WAIT01} and \textsf{WAIT2}: block diagram,
     specification, implementation.}
     \label{fig:wait012}
-    \vspace{-4mm}
+    \vspace{-5mm}
 \end{center}
 \end{figure}
 
