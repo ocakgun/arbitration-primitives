@@ -17,7 +17,7 @@
 This paper presents an overview of a family of asynchronous arbitration primitives designed
 to increase the resilience and efficiency of the new generation of circuits and systems.
 We cover primitives for synchronisation and decision-making with an emphasis on interfacing
-analog and digital worlds, sampling of non-persistent signals, and efficient handling of
+analogue and digital worlds, sampling of non-persistent signals, and efficient handling of
 correlated sensor events.
 \end{abstract}
 
@@ -27,17 +27,17 @@ correlated sensor events.
 
 The new generation of circuits and systems is breaking conventional walls between
 different timing, power and technology domains. Modern `synchronous' and `digital'
-systems are emphatically asynchronous-at-large and analog-at-heart: they contain tens
+systems are emphatically asynchronous-at-large and analogue-at-heart: they contain tens
 to hundreds of timing and voltage domains, some even thousands~\cite{2017_bohnenstiehl_kilocore}.
 Asynchronous arbitration primitives are now used both to orchestrate the communication
-between different clock domains~\cite{2017_jiang_noc} and to control the analog-digital
+between different clock domains~\cite{2017_jiang_noc} and to control the analogue-digital
 interfaces in on-chip power regulators~\cite{2017_sokolov_a4a}.
 
 % Asynchronous arbitration primitives are key to the
 % resilience and efficiency of these systems.
 
 This paper presents an overview of the recently developed asynchronous arbitration
-primitives that address the problem of interfacing between hazardous and/or analog
+primitives that address the problem of interfacing between hazardous and/or analogue
 worlds and hazard-free asynchronous circuits in a safe way. The primitives are
 also useful in purely digital settings, as they increase the robustness of event-driven
 asynchronous circuits by shortening their \emph{event sensitivity interval}, where an unexpected
@@ -54,6 +54,7 @@ publicly available under the MIT license~\cite{Arbitration_primitives_github}.
 % Below we review the language for the formal specification
 % of asynchronous circuits, which is used throughout the paper.
 
+\vspace{0.5mm}
 \subsection*{Formal specification of asynchronous circuits}\label{sec-stg}
 
 Signal Transition Graphs~(STGs) are commonly used for the specification,
@@ -91,7 +92,7 @@ A transition is \emph{persistent} if, once enabled, it will occur without first 
 disabled. The dummy \textsf{e} is the only \emph{non-persistent} transition in the
 example: \textsf{sig-} can disable it by consuming the token from \textsf{sig1}. Non-persistence
 can manifest itself as a \emph{hazard} in the circuit, whereby a gate starts
-switching but is stopped midway resulting in a short analog pulse.
+switching but is stopped midway resulting in a short analogue pulse.
 
 % Signal transition loop\\
 % Handshake\\
@@ -168,8 +169,6 @@ OR-causality~\cite{1996_yakovlev_or}: the inputs \textsf{sig} and \textsf{frc} a
 combined via a NOR gate, whose output is synchronised with the handshake \textsf{ctrl/san}
 using the \textsf{WAIT0} element.
 
-% The \textsf{RWAIT0} element is implemented analogously.
-
 \vspace{-0.5mm}
 \subsection*{\textsf{WAIT01} and \textsf{WAIT10}}
 \vspace{-0.5mm}
@@ -188,6 +187,7 @@ the symmetric \textsf{WAIT10} element, can be implemented analogously.
 \begin{figure}
 \begin{center}
     \includegraphics[scale=0.23]{fig/WAIT01-and-WAIT2.pdf}
+    \vspace{-6mm}
     \caption{\textsf{WAIT01} and \textsf{WAIT2}: block diagram,
     specification, implementation.}
     \label{fig:wait012}
@@ -200,7 +200,8 @@ the symmetric \textsf{WAIT10} element, can be implemented analogously.
 \textsf{WAIT2} is another combination of \textsf{WAIT} and \textsf{WAIT0}:
 it uses a 2-phase output handshake, waiting for high and low input values, one after
 the other, see Fig.~\ref{fig:wait012}(right). One can think of \textsf{WAIT2} as a 2-phase
-version of the \textsf{WAIT} element.
+version of the \textsf{WAIT} element, or as a C-element whose input \textsf{sig} is hardened
+against hazards.
 
 The STG contains two loops: the inner \textsf{sig} loop, which is unconstrained, and
 the outer handshake loop that synchronises the rising
@@ -324,7 +325,7 @@ serving multiple requests in bundles. The STG specification of
 
 The input channels of \textsf{OM} are assumed to be hazard-free, but one can use the
 synchronisation primitives presented in Section~\ref{sec-sync} to generate clean hazard-free
-handshakes from a hazardous input signal, e.g. produced by an analog sensor.
+handshakes from hazardous input signals, e.g. produced by analogue sensors.
 
 \begin{figure}
 \begin{center}
