@@ -83,7 +83,7 @@ is disabled. When a transition occurs, it \emph{consumes} the tokens on its inco
 are \emph{produces} them on its outgoing arcs, e.g. \textsf{ctrl+} moves the token to the
 arc~$\textsf{ctrl+} \longrightarrow \textsf{e}$. Undirected arcs, called
 \emph{read arcs}, are used to \emph{test} the existence of a token in a \emph{place}, shown as
-a circle (think of it just as a placeholder for a token), e.g. the read arc
+a circle (think of it as just a placeholder for a token), e.g. the read arc
 $\textsf{sig1} \frac{~~~~}{~} \textsf{e}$ allows the dummy \textsf{e} to occur only if
 the place is marked, i.e. if \textsf{sig=1}.
 
@@ -119,10 +119,10 @@ from the environment.
 \begin{figure*}
 \begin{center}
     \includegraphics[scale=0.23]{fig/RWAIT.pdf}
-    \vspace{-1mm}
+    \vspace{-2.5mm}
     \caption{\textsf{RWAIT}: block diagram, specification and implementation.}
     \label{fig:rwait}
-    \vspace{-5mm}
+    \vspace{-8mm}
 \end{center}
 \end{figure*}
 
@@ -132,7 +132,7 @@ input~\textsf{sig}. According to the STG specification, \textsf{sig} is unconstr
 is allowed to switch between~0 and~1 values with no regard to the output handshake -- this
 is captured by the loop with signal transitions \textsf{sig+} and \textsf{sig-}.
 Initially~\textsf{ctrl=0} and the input is isolated from the output \textsf{san}.
-By switching the~\textsf{ctrl} input, the element is switched into the \emph{waiting mode},
+By raising the~\textsf{ctrl} input, the element can be switched into the \emph{waiting mode},
 where it stays until~\textsf{sig} becomes high and enables the
 dummy~\textsf{e}. The output~\textsf{san=1} is then produced and persistently
 held\footnote{Here and further on, the output \textsf{san}
@@ -151,7 +151,9 @@ The symmetric version of the element that waits for the input to become low is
 called \textsf{WAIT0}; its top-level block diagram, the STG specification and
 the implementation are shown in Fig.~\ref{fig:wait}(right).
 
+\vspace{-0.5mm}
 \subsection*{\textsf{RWAIT} and \textsf{RWAIT0}}
+\vspace{-0.5mm}
 
 \textsf{RWAIT} and \textsf{RWAIT0} are modifications of the \textsf{WAIT} and \textsf{WAIT0}
 elements, respectively, with a possibility to persistently cancel the waiting request. This
@@ -168,17 +170,20 @@ using the \textsf{WAIT0} element.
 
 % The \textsf{RWAIT0} element is implemented analogously.
 
+\vspace{-0.5mm}
 \subsection*{\textsf{WAIT01} and \textsf{WAIT10}}
+\vspace{-0.5mm}
 
 \textsf{WAIT01} and \textsf{WAIT10} elements wait for a rising or falling edge of the input
-signal, respectively. Note that this is subtly different from waiting for high or low input value,
+signal, respectively. Note that this is subtly different from waiting for a high or low input value,
 e.g. a signal can be initially low, and to generate a falling edge event it must first go high.
 The \textsf{WAIT01} specification in Fig.~\ref{fig:wait012}(left-middle) tracks the input changes
 via two dummy transitions that are enabled in sequence when \textsf{sig=0} and \textsf{sig=1} hold.
-This can be implemented by connecting \textsf{WAIT0} and \textsf{WAIT} in sequence.
+This can be implemented by connecting \textsf{WAIT0} and \textsf{WAIT} in sequence,
+as shown in Fig.~\ref{fig:wait012}(left-bottom).
 
-An element waiting for an arbitrary fixed pattern of values, e.g. the symmetric
-\textsf{WAIT10}, can be implemented analogously.
+An element waiting for an arbitrary fixed pattern of alternating 0s and 1s, e.g.
+the symmetric \textsf{WAIT10} element, can be implemented analogously.
 
 \begin{figure}
 \begin{center}
@@ -186,15 +191,16 @@ An element waiting for an arbitrary fixed pattern of values, e.g. the symmetric
     \caption{\textsf{WAIT01} and \textsf{WAIT2}: block diagram,
     specification, implementation.}
     \label{fig:wait012}
-    \vspace{-5mm}
+    \vspace{-7mm}
 \end{center}
 \end{figure}
 
 \subsection*{\textsf{WAIT2}}
 
-\textsf{WAIT2} is another combination of \textsf{WAIT} and \textsf{WAIT0} elements:
+\textsf{WAIT2} is another combination of \textsf{WAIT} and \textsf{WAIT0}:
 it uses a 2-phase output handshake, waiting for high and low input values, one after
-the other, see Fig.~\ref{fig:wait012}(right).
+the other, see Fig.~\ref{fig:wait012}(right). One can think of \textsf{WAIT2} as a 2-phase
+version of the \textsf{WAIT} element.
 
 The STG contains two loops: the inner \textsf{sig} loop, which is unconstrained, and
 the outer handshake loop that synchronises the rising
@@ -203,18 +209,20 @@ the outer handshake loop that synchronises the rising
 ($\textsf{ctrl-} \longrightarrow \textsf{san-}$)
 phases with conditions \textsf{sig=1} and \textsf{sig=0}, respectively.
 
-The implementation uses a toggle-like component \textsf{T}, which steers the rising and
-falling edges of \textsf{ctrl} to the two four-phase output handshakes controlling
-the \textsf{WAIT} and \textsf{WAIT0} elements. It is a standard
-asynchronous component, and its implementation is beyond the scope of this paper.
+The implementation uses a toggle-like controller to steer the
+rising and falling edges of \textsf{ctrl} to the inputs of the \textsf{WAIT} and
+\textsf{WAIT0} elements, in sequence, and take care of their appropriate
+reset. The controller was developed in \textsc{Workcraft}~\cite{Workcraft_website}
+using conventional asynchronous design flow (we omit further
+details due to the lack of space).
 
 \begin{figure*}
 \begin{center}
     \includegraphics[scale=0.23]{fig/WAITX.pdf}
-    \vspace{-2mm}
+    \vspace{-3mm}
     \caption{\textsf{WAITX}: block diagram, specification and implementation.}
     \label{fig:waitx}
-    \vspace{-6mm}
+    \vspace{-7mm}
 \end{center}
 \end{figure*}
 
@@ -230,7 +238,7 @@ The \textsf{WAITX} element~\cite{2017_khomenko_waitx} arbitrates between two
 non-persistent inputs $\{\textsf{sig1}, \textsf{sig2}\}$, producing a clean
 asynchronous dual-rail handshake: depending on which of the two signals arrives
 first, exactly one of the grant signals $\{\textsf{g1}, \textsf{g2}\}$ is issued, see
-Fig.~\ref{fig:waitx}. The place \textsf{me} with two consuming arcs represents to
+Fig.~\ref{fig:waitx}. The place \textsf{me} with two consuming arcs represents
 the arbitration decision that needs to be made: if the inputs arrive very close to
 each other, both of the two dummy transitions can become enabled but only one
 of them can occur, since \textsf{me} can have at most one token. In the reset phase
@@ -241,7 +249,8 @@ both from the metastability associated with non-persistent inputs, as well as fr
 the metastability associated with making the decision of which input signal arrives first.
 The implementation relies on \textsf{RWAIT} elements for synchronisation with
 non-persistent signals, and uses an \textsf{ME} element to make the decision on their
-arrival order.
+arrival order. See~\cite{2017_khomenko_waitx} for further implementation details and for a
+generalisation to more than 2 input signals.
 
 \subsection*{\textsf{WAITX2}}
 
@@ -251,7 +260,7 @@ arrival order.
     \includegraphics[scale=0.23]{fig/WAITX2.pdf}
     \caption{\textsf{WAITX2}: block diagram, specification and implementation.}
     \label{fig:waitx2}
-    \vspace{-5mm}
+    \vspace{-7mm}
 \end{center}
 \end{figure}
 
@@ -265,9 +274,10 @@ The implementation comprises \textsf{WAITX} and two \textsf{WAIT0} elements cont
 by toggle-like asynchronous logic, which activates the right \textsf{WAIT0} element in the
 reset phase. The synthesis and technology mapping of the control was performed using
 conventional asynchronous design approaches automated in
-\textsc{Workcraft}~\cite{2017_sokolov_a4a}.
+\textsc{Workcraft}~\cite{Workcraft_website}.
 
 \subsection*{\textsf{SAMPLE}}
+\vspace{-1mm}
 
 \begin{figure}
 \begin{center}
@@ -281,14 +291,16 @@ conventional asynchronous design approaches automated in
 The purpose of the \textsf{SAMPLE} element is to check whether the voltage on the input
 \textsf{sig} is above the threshold, see Fig.~\ref{fig:sample}. The specification is similar
 to that of \textsf{WAITX} but the two dummy transitions are controlled by conditions
-corresponding to the state of the same signal.
+corresponding to the state of the same input \textsf{sig}.
 
 The implementation is based on \textsf{WAITX} that decides which of the two inputs,
-\textsf{sig} or its inverted version, becomes high first. Note that both inputs may be
-high at the same time, e.g. during a transition of \textsf{sig}, in which case
-\textsf{SAMPLE} is allowed to make an arbitrary decision.
+\textsf{sig} or its inverted version, becomes high first. Note that both inputs of
+\textsf{WAITX} may be high at the same time, e.g. during a transition of
+\textsf{sig}, in which case \textsf{SAMPLE} is allowed to make an arbitrary decision.
+However, if the input signal is stable, no metastability resolution is required and
+\textsf{SAMPLE} can therefore quickly produce the correct output.
 
-\subsection*{\textsf{OM}}
+\subsection*{Opportunistic Merge}
 
 The \emph{opportunistic merge} \textsf{OM} element~\cite{2015_mokhov_om} merges two
 request-acknowledgement channels $\{\textsf{r1}/\textsf{a1}, \textsf{r2}/\textsf{a2}\}$
@@ -306,12 +318,13 @@ acknowledgements to both input channels.
 The intended application of \textsf{OM} is to handle concurrent (and potentially correlated) requests
 from several clients to a kind of service that benefits all the clients simultaneously. Examples
 include triggering an alarm by (any of) several sensors, re-charging of a shared DRAM, and
-various kinds of power management~\cite{2017_sokolov_a4a}. The STG specification of
+various kinds of power management~\cite{2017_sokolov_a4a}. All these use cases benefit from
+serving multiple requests in bundles. The STG specification of
 \textsf{OM}, as well as further implementation details can be found in~\cite{2015_mokhov_om}.
 
-The input channels of \textsf{OM} are assumed to be hazard-free, but one can use one of the
-synchronisation primitives presented in Section~\ref{sec-sync} to generate a clean hazard-free
-handshake from a hazardous input signal, e.g. produced by an analog sensor.
+The input channels of \textsf{OM} are assumed to be hazard-free, but one can use the
+synchronisation primitives presented in Section~\ref{sec-sync} to generate clean hazard-free
+handshakes from a hazardous input signal, e.g. produced by an analog sensor.
 
 \begin{figure}
 \begin{center}

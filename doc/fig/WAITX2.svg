@@ -10,7 +10,7 @@
    font-size="12px"
    font-style="normal"
    font-weight="normal"
-   height="1552.4805"
+   height="1512.4805"
    stroke-miterlimit="10"
    width="1040.3221"
    id="svg2"
@@ -39,14 +39,14 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1858"
-     inkscape:window-height="1177"
+     inkscape:window-width="1445"
+     inkscape:window-height="841"
      id="namedview197"
      showgrid="false"
-     inkscape:zoom="0.43421483"
-     inkscape:cx="475.12147"
-     inkscape:cy="842.8991"
-     inkscape:window-x="1974"
+     inkscape:zoom="0.30703625"
+     inkscape:cx="37.577846"
+     inkscape:cy="795.26693"
+     inkscape:window-x="83"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg2"
@@ -847,7 +847,7 @@
     </g>
   </g>
   <g
-     transform="matrix(1.4,0,0,1.4,-2.1138866,838.38047)"
+     transform="matrix(1.4,0,0,1.4,-2.1138866,798.38047)"
      id="g5">
     <g
        style="fill:#ffffff;stroke:#ffffff"

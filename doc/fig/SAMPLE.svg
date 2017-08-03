@@ -10,7 +10,7 @@
    font-size="12px"
    font-style="normal"
    font-weight="normal"
-   height="1197.8489"
+   height="1117.8489"
    stroke-miterlimit="10"
    width="933.24231"
    id="svg2"
@@ -44,8 +44,8 @@
      id="namedview197"
      showgrid="false"
      inkscape:zoom="0.30703625"
-     inkscape:cx="885.38297"
-     inkscape:cy="291.9097"
+     inkscape:cx="134.65728"
+     inkscape:cy="251.90968"
      inkscape:window-x="83"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
@@ -59,7 +59,7 @@
      id="genericDefs" />
   <g
      id="g5"
-     transform="translate(-5,338.23331)">
+     transform="translate(-5,298.23331)">
     <g
        font-size="0.75px"
        transform="matrix(50,0,0,50,49.585,228.865)"
@@ -671,7 +671,7 @@
   </g>
   <g
      id="g4414"
-     transform="translate(7.39198,257.63466)">
+     transform="translate(7.39198,177.63466)">
     <rect
        id="rect9-0"
        y="653.1142"
