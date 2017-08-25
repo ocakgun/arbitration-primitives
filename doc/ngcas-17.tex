@@ -141,7 +141,7 @@ is the `sanitised' (persistent) version of the `dirty' (non-persistent) input \t
 until \textsf{WAIT} is reset by releasing the \textsf{ctrl} input (the transition~\textsf{ctrl-}).
 
 Note that an input spike (\textsf{sig+} followed by \textsf{sig-}) in the waiting
-mode can be too short fot the \textsf{WAIT} element to register it, in which case the spike
+mode can be too short for the \textsf{WAIT} element to register it, in which case the spike
 is ignored. The non-persistent behaviour and the associated metastability is fully contained
 within the element, guaranteeing a clean hazard-free output. This is achieved using the
 \emph{mutual-exclusion} \textsf{ME} element~\cite{2008_kinniment_synchronisation}.
